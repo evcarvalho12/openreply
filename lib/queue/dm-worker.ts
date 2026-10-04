@@ -849,12 +849,19 @@ async function sendFollowRecheckAck({
       "NX"
     );
     if (first !== "OK") return;
+    const send = () =>
+      sendDirectMessage({ context, instagramAccountId, userId, message });
+    // Without an operation id there is nothing to claim; the Redis key above
+    // already limits this to one acknowledgement per re-check cycle.
+    if (!operationId) {
+      await send();
+      return;
+    }
     await sendPostbackOnce({
       // Its own id: the tap's id is claimed later by the link or prompt that
       // the re-check sends, and claiming it here would suppress that message.
-      operationId: operationId ? `${operationId}:ack` : null,
-      send: () =>
-        sendDirectMessage({ context, instagramAccountId, userId, message }),
+      operationId: `${operationId}:ack`,
+      send,
     });
   } catch (error) {
     console.log(
