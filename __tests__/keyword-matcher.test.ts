@@ -185,6 +185,30 @@ describe("matchKeywords — numeric keyword / letter-O homoglyph", () => {
   });
 });
 
+describe("matchKeywords — one or two letter keyword", () => {
+  // Production: an "IA" campaign on any post fired on comments like
+  // "ia ser demais" on a viral reel, because "ia" is also a Portuguese verb.
+  it("matches when the comment is only the keyword", () => {
+    expect(matchKeywords("IA", ["IA"], true).matched).toBe(true);
+    expect(matchKeywords("ia", ["IA"], true).matched).toBe(true);
+    expect(matchKeywords("Ia 🙏", ["IA"], true).matched).toBe(true);
+    expect(matchKeywords("IA!", ["IA"], true).matched).toBe(true);
+  });
+
+  it("does not match the keyword inside a sentence", () => {
+    expect(matchKeywords("ia ser demais", ["IA"], true).matched).toBe(false);
+    expect(matchKeywords("Vi que vc trabalha com ia", ["IA"], true).matched).toBe(false);
+  });
+
+  it("does not match an accented word that folds to the keyword", () => {
+    expect(matchKeywords("vim aí", ["ai"], true).matched).toBe(false);
+  });
+
+  it("leaves longer keywords matching inside a sentence", () => {
+    expect(matchKeywords("quero o link", ["link"], true).matched).toBe(true);
+  });
+});
+
 describe("matchKeywords — edge cases", () => {
   it("should return false for empty comment text", () => {
     const result = matchKeywords("", ["link"], true);

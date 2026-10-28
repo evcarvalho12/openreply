@@ -202,6 +202,17 @@ export function matchKeywords(
       ? foldNumericHomoglyphs(cleanedKeyword)
       : cleanedKeyword;
 
+    // A keyword of one or two letters ("IA", "OK") is almost always also an
+    // ordinary word somewhere ("ia" is a verb in Portuguese: "ia ser demais"),
+    // so on a busy post it fires on comments that never asked for anything.
+    // Such a keyword only matches when it is the whole comment ("IA", "ia 🙏").
+    if (wholeWordMatch && !numericLike && compareKeyword.length <= 2) {
+      if (compareText === compareKeyword) {
+        return { matched: true, matchedKeyword: keyword };
+      }
+      continue;
+    }
+
     if (wholeWordMatch) {
       const escapedKeyword = compareKeyword.replace(
         /[.*+?^${}()|[\]\\]/g,
