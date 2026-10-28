@@ -204,6 +204,11 @@ describe("matchKeywords — one or two letter keyword", () => {
     expect(matchKeywords("vim aí", ["ai"], true).matched).toBe(false);
   });
 
+  it("applies in partial mode too", () => {
+    expect(matchKeywords("O cara que levanta cedo todo dia", ["IA"], false).matched).toBe(false);
+    expect(matchKeywords("IA", ["IA"], false).matched).toBe(true);
+  });
+
   it("leaves longer keywords matching inside a sentence", () => {
     expect(matchKeywords("quero o link", ["link"], true).matched).toBe(true);
   });

@@ -206,7 +206,9 @@ export function matchKeywords(
     // ordinary word somewhere ("ia" is a verb in Portuguese: "ia ser demais"),
     // so on a busy post it fires on comments that never asked for anything.
     // Such a keyword only matches when it is the whole comment ("IA", "ia 🙏").
-    if (wholeWordMatch && !numericLike && compareKeyword.length <= 2) {
+    // Applies in partial mode too: there "ia" would also hit "dia", "política".
+    // Latin only: two CJK characters ("链接") are a full, unambiguous word.
+    if (!numericLike && compareKeyword.length <= 2 && /^\p{Script=Latin}+$/u.test(compareKeyword)) {
       if (compareText === compareKeyword) {
         return { matched: true, matchedKeyword: keyword };
       }
